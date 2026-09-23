@@ -86,9 +86,12 @@ offtake) and `p` (EUR/MWh), on a UTC quarter-hour index. Any meter data source w
 
 ## Price data
 
-`bess_baseline/data/belpex_da_be.csv` holds Belgian day-ahead prices (EPEX SPOT BE, via
-ENTSO-E) from 2020, hourly until 30 September 2025 and quarter-hourly since. EnergyBytes
-refreshes the file with each release. `bess-baseline prices` prints the bundled range.
+`bess_baseline/data/belpex_da_be.csv` holds Belgian day-ahead prices (EPEX SPOT BE) from
+2020, hourly until 30 September 2025 and quarter-hourly since. Source: ENTSO-E Transparency
+Platform; a small number of recent values come from
+[energy-charts.info](https://energy-charts.info) (Fraunhofer ISE, CC BY 4.0) when ENTSO-E
+was late. EnergyBytes refreshes the file with each release. `bess-baseline prices` prints
+the bundled range.
 
 ## Scope
 
