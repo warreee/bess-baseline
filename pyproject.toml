@@ -1,6 +1,6 @@
 [project]
 name = "bess-baseline"
-version = "0.1.0"
+version = "0.1.1"
 description = "An open day-ahead baseline for battery storage behind the meter: what an owner earns with plain price arbitrage, to judge BSP offers against."
 readme = "README.md"
 requires-python = ">=3.11"

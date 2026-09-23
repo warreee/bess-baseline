@@ -55,3 +55,11 @@ def test_two_quarter_arbitrage_analytic():
     batt = Battery(power_kw=4, capacity_kwh=1, roundtrip=1.0)
     e = evaluate(optimum(df, batt, Tariffs(), SiteLimits()), batt, Tariffs())
     assert e["benefit_spot"] == pytest.approx(0.1, abs=1e-6)  # 1 kWh * 100 EUR/MWh
+
+
+def test_progress_callback_reports_start_and_end():
+    df = make_df(days=3)
+    seen = []
+    simulate_dayahead(df, Battery(50, 100, 0.9), Tariffs(), SiteLimits(), progress=lambda done, total: seen.append((done, total)))
+    assert seen[0] == (0, len(df)) and seen[-1] == (len(df), len(df))
+    assert all(a <= b for (a, _), (b, _) in zip(seen, seen[1:]))

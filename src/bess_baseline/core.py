@@ -240,7 +240,7 @@ def simulate_dayahead(df: pd.DataFrame, batt: Battery, tar: Tariffs, lim: SiteLi
                       forecast: str = "wd_median4", replan_every: int = 4, publish_hour: int = 13,
                       spot_only: bool = False, peak_floor_days: int = 0,
                       peak_floor_source: str = "site", reserve_frac: float = 0.0,
-                      reflex_line: str = "plan") -> Dispatch:
+                      reflex_line: str = "plan", progress=None) -> Dispatch:
     """Closed-loop: plannen op verwachting, uitvoeren op realiteit.
 
     Op elk herplanmoment loopt de horizon tot het einde van de lokale dag, of tot het einde
@@ -254,6 +254,8 @@ def simulate_dayahead(df: pd.DataFrame, batt: Battery, tar: Tariffs, lim: SiteLi
     piekreflex (afname boven de toegelaten piek) mag eruit ontladen.
     reflex_line: "plan" = de reflex houdt de lijn van het plan (>= piekverwachting);
     "unavoidable" = de reflex houdt max(lopende maandpiek, sitepiek 28 dagen min batterijvermogen).
+    progress: optional callable(done_quarters, total_quarters), called about once per simulated
+    day and once at the end; a long run can report where it is.
     """
     idx = df.index
     p = df["p"].values
@@ -290,6 +292,8 @@ def simulate_dayahead(df: pd.DataFrame, batt: Battery, tar: Tariffs, lim: SiteLi
     plan_peak = {}
     plan_start = 0
     for t in range(T):
+        if progress is not None and t % 96 == 0:
+            progress(t, T)
         if plan_c is None or (t - plan_start) % replan_every == 0 or t > plan_end:
             e = horizon_end[t]
             sl = slice(t, e + 1)
@@ -340,6 +344,8 @@ def simulate_dayahead(df: pd.DataFrame, batt: Battery, tar: Tariffs, lim: SiteLi
         soc_arr[t] = soc
         realized_kw[t] = (n[t] + ct - dt) / Q
         running[mid[t]] = max(running[mid[t]], realized_kw[t])
+    if progress is not None:
+        progress(T, T)
     return Dispatch(idx, n, p, c, d, soc_arr, {"forecast": forecast, "replan_every": replan_every, "peak_floor_days": peak_floor_days, "peak_floor_source": peak_floor_source, "reserve_frac": reserve_frac})
 
 
